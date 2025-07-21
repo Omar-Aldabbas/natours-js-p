@@ -4,6 +4,28 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+exports.checkBody = (req, res, next) => {
+  if (!req.body.price || !req.body.name) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'MIssing name or Price',
+    });
+  }
+  next();
+};
+
+exports.checkID = (req, res, next, val) => {
+  console.log(`Tour ID is : ${val}`);
+
+  if (req.params.id * 1 <  0 || req.params.id * 1 > tours.length -1) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+  next();
+};
+
 exports.getAllTours = (req, res) => {
   console.log(req.requestTime);
   res.status(200).json({
@@ -45,7 +67,7 @@ exports.createNewTour = (req, res) => {
 
   tours.push(newTour);
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     (err) => {
       if (err) {
@@ -103,7 +125,7 @@ exports.updateTour = (req, res) => {
 };
 
 exports.deleteTour = (req, res) => {
-  const filePath = `${__dirname}/dev-data/data/tours-simple.json`;
+  const filePath = `${__dirname}/../dev-data/data/tours-simple.json`;
   const id = Number(req.params.id);
   const newTours = tours.filter((t) => t.id !== id);
 
