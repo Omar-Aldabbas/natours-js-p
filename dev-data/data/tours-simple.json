@@ -148,50 +148,5 @@
     "imageCover": "jordan-desert-cover.jpg",
     "images": ["wadi-rum-1.jpg", "petra-1.jpg", "dana-hike.jpg"],
     "startDates": ["2025-09-15,08:00", "2025-10-20,08:00", "2025-12-05,08:00"]
-  },
-  {
-    "id": 10,
-    "name": "Jordan Desert Explorer",
-    "duration": 7,
-    "maxGroupSize": 12,
-    "difficulty": "medium",
-    "ratingsAverage": 4.8,
-    "ratingsQuantity": 22,
-    "price": 1120,
-    "summary": "Experience the beauty of Jordan’s desert landscapes, ancient cities, and Bedouin culture.",
-    "description": "This unforgettable 7-day journey will take you through the red sands of Wadi Rum, the historic wonders of Petra, and the natural beauty of Dana Biosphere Reserve. You'll camp under the stars, hike through sandstone canyons, and enjoy traditional Jordanian meals. A perfect blend of adventure, culture, and relaxation.",
-    "imageCover": "jordan-desert-cover.jpg",
-    "images": ["wadi-rum-1.jpg", "petra-1.jpg", "dana-hike.jpg"],
-    "startDates": ["2025-09-15,08:00", "2025-10-20,08:00", "2025-12-05,08:00"]
-  },
-  {
-    "id": 11,
-    "name": "Jordan Desert Explorer",
-    "duration": 7,
-    "maxGroupSize": 12,
-    "difficulty": "medium",
-    "ratingsAverage": 4.8,
-    "ratingsQuantity": 22,
-    "price": 1120,
-    "summary": "Experience the beauty of Jordan’s desert landscapes, ancient cities, and Bedouin culture.",
-    "description": "This unforgettable 7-day journey will take you through the red sands of Wadi Rum, the historic wonders of Petra, and the natural beauty of Dana Biosphere Reserve. You'll camp under the stars, hike through sandstone canyons, and enjoy traditional Jordanian meals. A perfect blend of adventure, culture, and relaxation.",
-    "imageCover": "jordan-desert-cover.jpg",
-    "images": ["wadi-rum-1.jpg", "petra-1.jpg", "dana-hike.jpg"],
-    "startDates": ["2025-09-15,08:00", "2025-10-20,08:00", "2025-12-05,08:00"]
-  },
-  {
-    "id": 12,
-    "name": "Jordan Desert Explorer",
-    "duration": 7,
-    "maxGroupSize": 12,
-    "difficulty": "medium",
-    "ratingsAverage": 4.8,
-    "ratingsQuantity": 22,
-    "price": 1120,
-    "summary": "Experience the beauty of Jordan’s desert landscapes, ancient cities, and Bedouin culture.",
-    "description": "This unforgettable 7-day journey will take you through the red sands of Wadi Rum, the historic wonders of Petra, and the natural beauty of Dana Biosphere Reserve. You'll camp under the stars, hike through sandstone canyons, and enjoy traditional Jordanian meals. A perfect blend of adventure, culture, and relaxation.",
-    "imageCover": "jordan-desert-cover.jpg",
-    "images": ["wadi-rum-1.jpg", "petra-1.jpg", "dana-hike.jpg"],
-    "startDates": ["2025-09-15,08:00", "2025-10-20,08:00", "2025-12-05,08:00"]
   }
 ]
