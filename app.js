@@ -1,3 +1,5 @@
+
+
 const morgan = require('morgan');
 const express = require('express');
 
@@ -5,7 +7,6 @@ const userRouter = require('./routes/UserRouters');
 const tourRouter = require('./routes/tourRouters');
 
 const app = express();
-
 // MIDDLEWARES
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
