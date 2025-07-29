@@ -9,8 +9,15 @@ exports.getAllTours = async (req, res) => {
     excludedFields.forEach((el) => delete queryObj[el]);
 
     // Advance Filtring
-    // console.log(buildMongoQuery(queryObj));
-    const query = Tour.find(buildMongoQuery(queryObj));
+    let query = Tour.find(buildMongoQuery(queryObj));
+
+    // Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
     // Excute Query
     const tours = await query;
 
