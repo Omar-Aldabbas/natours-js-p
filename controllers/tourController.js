@@ -2,14 +2,15 @@ const Tour = require('../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   try {
-    //Build the query
+    // Filtring
     // eslint-disable-next-line node/no-unsupported-features/es-syntax
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    const query = Tour.find(queryObj);
-
+    // Advance Filtring
+    // console.log(buildMongoQuery(queryObj));
+    const query = Tour.find(buildMongoQuery(queryObj));
     // Excute Query
     const tours = await query;
 
@@ -102,3 +103,28 @@ exports.deleteTour = async (req, res) => {
     });
   }
 };
+
+////////////////////////////////////////////
+//this to parse the query to something that mongoose understand
+function buildMongoQuery(queryObj) {
+  const queryStr = JSON.stringify(queryObj).replace(
+    /\b(gte|gt|lte|lt)\b/g,
+    (match) => `$${match}`,
+  );
+
+  const raw = JSON.parse(queryStr);
+  const mongoQuery = {};
+
+  for (let key in raw) {
+    if (key.includes('[')) {
+      const [field, op] = key.split('[');
+      const operator = op.replace(']', '');
+      if (!mongoQuery[field]) mongoQuery[field] = {};
+      mongoQuery[field][operator] = raw[key];
+    } else {
+      mongoQuery[key] = raw[key];
+    }
+  }
+
+  return mongoQuery;
+}
