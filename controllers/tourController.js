@@ -1,5 +1,22 @@
 const Tour = require('../models/tourModel');
 
+exports.aliasTopTours = (req, res, next) => {
+  Object.defineProperty(req, 'query', {
+    value: {
+      limit: '5',
+      sort: '-ratingsAverage,price',
+      fields: 'name,price,ratingsAverage,summary,difficulty',
+    },
+    writable: true,
+    enumerable: true,
+    configurable: true,
+  });
+
+  // console.log('[aliasTopTours] New req.query:', req.query);
+  // console.log('[aliasTopTours] req.query.constructor:', req.query.constructor?.name);
+  next();
+};
+
 exports.getAllTours = async (req, res) => {
   try {
     // 1) Filtring
@@ -16,7 +33,7 @@ exports.getAllTours = async (req, res) => {
       const sortBy = req.query.sort.split(',').join(' ');
       query = query.sort(sortBy);
     } else {
-      query = query.sort({ createdAt: -1, _id: 1 }); 
+      query = query.sort({ createdAt: -1, _id: 1 });
     }
 
     // 3) Field Limiting || Projecting
@@ -33,10 +50,10 @@ exports.getAllTours = async (req, res) => {
     const skip = (page - 1) * limit;
     query = query.skip(skip).limit(limit);
 
-    if( req.query.page) {
+    if (req.query.page) {
       const num = await Tour.countDocuments();
-      if(skip >= num) {
-        throw new Error("Page Does not Exist")
+      if (skip >= num) {
+        throw new Error('Page Does not Exist');
       }
     }
     // Excute Query
