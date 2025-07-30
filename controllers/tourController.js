@@ -2,24 +2,24 @@ const Tour = require('../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   try {
-    // Filtring
+    // 1) Filtring
     // eslint-disable-next-line node/no-unsupported-features/es-syntax
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    // Advance Filtring
+    // 1) Advance Filtring
     let query = Tour.find(buildMongoQuery(queryObj));
 
-    // Sorting
+    // 2) Sorting
     if (req.query.sort) {
       const sortBy = req.query.sort.split(',').join(' ');
       query = query.sort(sortBy);
     } else {
-      query = query.sort('-createdAt');
+      query = query.sort({ createdAt: -1, _id: 1 }); 
     }
 
-    // Field Limiting || Projecting
+    // 3) Field Limiting || Projecting
     if (req.query.fields) {
       const fields = req.query.fields.split(',').join(' ');
       query = query.select(fields);
@@ -27,6 +27,18 @@ exports.getAllTours = async (req, res) => {
       query = query.select('-__v');
     }
 
+    // 4) Pagination
+    const page = +req.query.page || 1;
+    const limit = +req.query.limit || 100;
+    const skip = (page - 1) * limit;
+    query = query.skip(skip).limit(limit);
+
+    if( req.query.page) {
+      const num = await Tour.countDocuments();
+      if(skip >= num) {
+        throw new Error("Page Does not Exist")
+      }
+    }
     // Excute Query
     const tours = await query;
 

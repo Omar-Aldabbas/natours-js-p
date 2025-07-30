@@ -1,5 +1,3 @@
-
-
 const morgan = require('morgan');
 const express = require('express');
 
@@ -20,6 +18,13 @@ app.use((req, res, next) => {
   console.log('Hello from the Middleware');
   next();
 });
+
+// app.use((req, res, next) => {
+//   req.query.page = req.query.page ? +req.query.page : 1;
+//   req.query.limit = req.query.limit ? Math.min(+req.query.limit, 100) : 10;
+//   console.log(req.query);
+//   next();
+// });
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
