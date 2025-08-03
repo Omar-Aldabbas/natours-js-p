@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const slugify = require('slugify');
+// const slugify = require('slugify');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -55,6 +55,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
@@ -63,7 +67,7 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
-//DOCUMENT MIDDLEWARE: only work with .create() and .save()
+//DOCUMENT MIDDLEWARE: only work with .create() and .save() , this point at document (current)
 // tourSchema.pre('save', function (next) {
 //   console.log(this);
 //   this.slug = slugify(this.name, { lower: true });
@@ -75,6 +79,10 @@ tourSchema.virtual('durationWeeks').get(function () {
 //   next();
 // });
 
+//QUERY MiDDLEWARE : look at hooks point at query
+tourSchema.pre('find', function (next) {
+  next();
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
