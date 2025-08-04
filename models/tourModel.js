@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 // const slugify = require('slugify');
+const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -8,6 +9,9 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour should have a name'],
       unique: true,
       trim: true,
+      maxlength: [40, 'A tour name must have less or equal than 40 characters'],
+      minlength: [10, 'A tour name must have less or equal than 10 characters'],
+      // validate: [validator.isAlpha, 'Tour name must only contain characters'],
     },
     slug: String,
     duration: {
@@ -21,10 +25,16 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'A tour must have a difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'difficult'],
+        message: 'Difficulty is either: easy, medium or difficult',
+      },
     },
     ratingsAverage: {
       type: Number,
       default: 4,
+      min: [1, 'Rating must be Above than 1.0'],
+      max: [5, 'Rating must be below than 5.0'],
     },
     ratingsQuantity: {
       type: Number,
@@ -34,7 +44,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Tour should have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val) {
+          // this only points to current DOC on NEW document  creation
+          return val < this.price;
+        },
+        message: 'Discount price ({VALUE}) should be below the regular price',
+      },
+    },
     summary: {
       type: String,
       trim: true,
@@ -67,6 +86,12 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+//
+
+const Tour = mongoose.model('Tour', tourSchema);
+
+module.exports = Tour;
+
 //DOCUMENT MIDDLEWARE: only work with .create() and .save() , this point at document (current)
 // tourSchema.pre('save', function (next) {
 //   console.log(this);
@@ -74,16 +99,29 @@ tourSchema.virtual('durationWeeks').get(function () {
 //   next();
 // });
 
-// tourSchema.post('save', function (doc, next) {
-//   console.log(doc);
+// // tourSchema.post('save', function (doc, next) {
+// //   console.log(doc);
+// //   next();
+// // });
+
+// //QUERY MiDDLEWARE : look at hooks point at query
+// tourSchema.pre(/^find/, function (next) {
+//   // tourSchema.pre('find', function (next) {
+//   this.find({ secretTour: { $ne: true } });
+
+//   this.start = Date.now();
 //   next();
 // });
 
-//QUERY MiDDLEWARE : look at hooks point at query
-tourSchema.pre('find', function (next) {
-  next();
-});
+// // tourSchema.post(/^find/, function (docs, next) {
+// //   console.log(`Query Took ${Date.now() - this.start} milli sec`)
+// //   // console.log(docs);
+// //   next();
+// // });
 
-const Tour = mongoose.model('Tour', tourSchema);
-
-module.exports = Tour;
+// // Aggregation Middleware
+// tourSchema.pre('aggregate', function (next) {
+//   // this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   console.log(this.pipeline());
+//   next();
+// });
