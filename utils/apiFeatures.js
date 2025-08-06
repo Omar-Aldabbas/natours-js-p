@@ -1,4 +1,5 @@
-const Tour = require('../models/tourModel')
+const Tour = require('../models/tourModel');
+
 class APIFeatures {
   // query ==> the Tour.find()
   // queryString ==> req.query
