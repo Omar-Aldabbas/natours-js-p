@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre('save', async (req, res, next) => {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
   this.password = await bcrypt.hash(this.password, 12);
@@ -59,6 +59,15 @@ userSchema.pre('save', async (req, res, next) => {
 
   next();
 });
+
+userSchema.set('toJSON', {
+  transform: function (doc, ret, options) {
+    delete ret.password;
+    delete ret.passwordConfirm;
+    return ret;
+  },
+});
+
 
 const User = mongoose.model('User', userSchema);
 

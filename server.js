@@ -5,7 +5,6 @@ process.on('uncaughtException', (err) => {
   console.log('UNCAUGHTEXCEPTION! SHUTTING DOWN .....⏳');
   console.log(err.name, err.message);
   process.exit(1); //uncleanstate
-
 });
 
 dotenv.config();
