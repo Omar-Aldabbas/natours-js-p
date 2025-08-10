@@ -24,22 +24,57 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.login = (req, res, next) => {
-  const { name, email, password } = req.body;
+// exports.login = (req, res, next) => {
+//   const { name, email, password } = req.body;
 
-  //Check if password and email exists
+//   //Check if password and email exists
+//   if (!email || !password) {
+//     return next(new AppError('PLease inter your Password and Email', 400));
+//   }
+
+//   //Check if user exists & password correct
+
+//   //if ok, Send token to client
+
+//   const token = '';
+
+//   res.status(200).json({
+//     status: 'success',
+//     token,
+//   });
+// };
+
+const bcrypt = require('bcryptjs');
+
+exports.login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // 1) Check if email and password exist
   if (!email || !password) {
-    return next(new AppError('PLease inter your Password and Email', 400));
+    return next(new AppError('Please provide email and password!', 400));
   }
 
-  //Check if user exists & password correct
+  // 2) Find user by email, explicitly select password (since select: false in schema)
+  const user = await User.findOne({ email }).select('+password');
 
-  //if ok, Send token to client
+  if (!user) {
+    return next(new AppError('Incorrect email or password', 401));
+  }
 
-  const token = '';
+  // 3) Check if password is correct
+  const isCorrect = await bcrypt.compare(password, user.password);
+  if (!isCorrect) {
+    return next(new AppError('Incorrect email or password', 401));
+  }
 
+  // 4) If ok, generate token
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+
+  // 5) Send response
   res.status(200).json({
     status: 'success',
     token,
   });
-};
+});
