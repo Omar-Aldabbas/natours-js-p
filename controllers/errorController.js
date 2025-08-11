@@ -1,7 +1,7 @@
 const AppError = require('../utils/appError');
 
 const handleValidationErrorDB = (err) => {
-  const errors = Object.values(err.errors).map(el => el.message)
+  const errors = Object.values(err.errors).map((el) => el.message);
   const message = `Invalid input data. ${errors.join('. ')}`;
 
   return new AppError(message, 400);
@@ -49,6 +49,14 @@ const sendErrorProd = (err, res) => {
   }
 };
 
+const handleJsonWebTokenError = () => {
+  return new AppError('Invalid token. Please login again', 401);
+};
+
+const handleTokenExpiredError = () => {
+  return new AppError('Tour token has Expired! Please log in again.', 401);
+};
+
 module.exports = (err, req, res, next) => {
   // if (!(err instanceof AppError)) {
   //   err = new AppError(err.message || 'Something went wrong', 500);
@@ -66,6 +74,8 @@ module.exports = (err, req, res, next) => {
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
     if (error.name === 'ValidationError')
       error = handleValidationErrorDB(error);
+    if (err.name === 'JsonWebTokenError') error = handleJsonWebTokenError();
+    if (err.name === 'TokenExpiredError') error = handleTokenExpiredError();
     sendErrorProd(error, res);
   }
 };

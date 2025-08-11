@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password us required'],
     minlength: [8, 'Password must be at least 8 characters long'],
+    select: false,
     validate: {
       validator: function (value) {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(
@@ -34,7 +35,6 @@ const userSchema = new mongoose.Schema({
       message:
         'Password must have one Uppercase letter, One lowercase letter, One number and one speciel character',
     },
-    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -47,6 +47,7 @@ const userSchema = new mongoose.Schema({
       },
       message: 'Passwords do not match',
     },
+    passwordChangedAt: Date,
   },
 });
 
@@ -68,6 +69,27 @@ userSchema.set('toJSON', {
   },
 });
 
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword,
+) {
+  return bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changesPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    //
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10,
+    );
+    console.log.apply(JWTTimestamp, changedTimestamp);
+
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  return false;
+};
 
 const User = mongoose.model('User', userSchema);
 
