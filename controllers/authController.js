@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const AppError = require('../utils/appError');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
+const sendEmail = require('../utils/email');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -116,3 +117,52 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  if (!req.body || !req.body.email) {
+    return next(new AppError('Please provide an email address', 400));
+  }
+
+  // 1) GET user from  the POSted email
+  const user = await User.findOne({ email: req.body.email });
+  // 1)b Check if user exists
+  if (!user) {
+    return next(new AppError('There is no user with this email address', 404));
+  }
+  // 2) Create a resetToken
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+  // 3) send the token via email to user POSTed email
+  const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+
+  const message = `Forgot your password submit a PATCH request with your new password and passwordConfirm to: ${resetURL}\n
+   If you didn't forget it please ignore this email.`;
+
+  console.log('Email to send:', user.email);
+  console.log('Reset token:', resetToken);
+  console.log('Reset URL:', resetURL);
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'your password reset token only valid for 10m',
+      message,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token send to email',
+    });
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError('There was an error sending an email. Try again later!'),
+      500,
+    );
+  }
+});
+
+exports.resetPassword = (req, res, next) => {};
