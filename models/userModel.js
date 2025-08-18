@@ -57,7 +57,14 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
+
+//MIDDLEWARES :
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
@@ -66,7 +73,7 @@ userSchema.pre('save', async function (next) {
 
   this.passwordConfirm = undefined;
 
-  next();
+  // next();
 });
 
 userSchema.set('toJSON', {
@@ -86,16 +93,19 @@ userSchema.methods.correctPassword = async function (
 
 userSchema.methods.changesPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
-    //
     const changedTimestamp = parseInt(
       this.passwordChangedAt.getTime() / 1000,
       10,
     );
-    console.log.apply(JWTTimestamp, changedTimestamp);
+    console.log(
+      'JWTTimestamp:',
+      JWTTimestamp,
+      'changedTimestamp:',
+      changedTimestamp,
+    );
 
     return JWTTimestamp < changedTimestamp;
   }
-
   return false;
 };
 
@@ -114,6 +124,21 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+
+  next();
+});
+
+userSchema.pre(/^find/, function (next) {
+  // this points to current query
+
+  this.find({ active: { $ne: false } });
+  next();
+});
+//
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
